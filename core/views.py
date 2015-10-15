@@ -30,7 +30,7 @@ class QuestionListView(ListView):
     model = Question
     template_name = "question/question_list.html"
     paginate_by = 5
-    
+
 class QuestionDetailView(DetailView):
     model = Question
     template_name = "question/question_detail.html"
@@ -48,7 +48,7 @@ class QuestionDetailView(DetailView):
 class QuestionUpdateView(UpdateView):
     model = Question
     template_name = 'question/question_form.html'
-    fields = ['title', 'description']
+    fields = ['title', 'description', 'visibility']
 
     def get_object(self, *args, **kwargs):
         object = super(QuestionUpdateView, self).get_object(*args, **kwargs)
@@ -145,7 +145,7 @@ class UserDetailView(DetailView):
     def get_context_data(self, **kwargs):
       context = super(UserDetailView, self).get_context_data(**kwargs)
       user_in_view = User.objects.get(username=self.kwargs['slug'])
-      questions = Question.objects.filter(user=user_in_view)
+      questions = Question.objects.filter(user=user_in_view).exclude(visibility=1)
       context['questions'] = questions
       answers = Answer.objects.filter(user=user_in_view)
       context['answers'] = answers
@@ -185,7 +185,7 @@ class UserDeleteView(DeleteView):
         user.is_active = False
         user.save()
         return redirect(self.get_success_url())
-      
+
 class SearchQuestionListView(QuestionListView):
     def get_queryset(self):
         incoming_query_string = self.request.GET.get('query','')
